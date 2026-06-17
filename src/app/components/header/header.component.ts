@@ -20,6 +20,7 @@ import { AuthService } from '../../services/auth.service';
         <a routerLink="/roulette"  routerLinkActive="activo">Ruleta</a>
         <a routerLink="/blackjack" routerLinkActive="activo">Blackjack</a>
         <a routerLink="/history"   routerLinkActive="activo">Historial</a>
+        <a routerLink="/dashboard" routerLinkActive="activo">Dashboard</a>
       </nav>
 
       <div class="acciones" *ngIf="auth.autenticado(); else anon">
