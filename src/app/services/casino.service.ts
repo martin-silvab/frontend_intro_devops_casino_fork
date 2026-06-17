@@ -23,7 +23,10 @@ import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import {
   Juego, Transaccion, ResultadoSlots, ResultadoRuleta,
-  ApuestaRuleta, EstadoBlackjack, Usuario
+  ApuestaRuleta, EstadoBlackjack, Usuario,
+  Bono, BonoReclamado, EventoDeportivo, SeleccionApuestaDeportiva,
+  ApuestaDeportiva, RespuestaApuestaDeportiva, RespuestaReclamarBono,
+  EstadisticasMias
 } from '../models/casino.models';
 
 @Injectable({ providedIn: 'root' })
@@ -78,5 +81,42 @@ export class CasinoService {
     return this.http.post<EstadoBlackjack>(
       `${this.api}/api/juegos/blackjack/accion`, { sesionId, accion }
     ).pipe(tap((r) => this.auth.setSaldo(r.saldo)));
+  }
+
+    // ---------- Bonos Service ----------
+  listarBonos() {
+    return this.http.get<{ bonos: Bono[] }>(`${this.api}/api/bonos`);
+  }
+
+  misBonos() {
+    return this.http.get<{ reclamados: BonoReclamado[] }>(`${this.api}/api/bonos/mis-bonos`);
+  }
+
+  reclamarBono(codigo: string, montoBase = 0) {
+    return this.http.post<RespuestaReclamarBono>(
+      `${this.api}/api/bonos/${codigo}/reclamar`,
+      { monto_base: montoBase }
+    ).pipe(tap((r) => this.auth.setSaldo(r.saldo)));
+  }
+
+  // ---------- Apuestas Service ----------
+  listarEventosDeportivos() {
+    return this.http.get<{ eventos: EventoDeportivo[] }>(`${this.api}/api/apuestas/eventos`);
+  }
+
+  apostarEvento(eventoId: number, seleccion: SeleccionApuestaDeportiva, monto: number) {
+    return this.http.post<RespuestaApuestaDeportiva>(
+      `${this.api}/api/apuestas`,
+      { evento_id: eventoId, seleccion, monto }
+    ).pipe(tap((r) => this.auth.setSaldo(r.saldo)));
+  }
+
+  misApuestasDeportivas() {
+    return this.http.get<{ apuestas: ApuestaDeportiva[] }>(`${this.api}/api/apuestas/mis-apuestas`);
+  }
+
+  // ---------- Estadísticas Service ----------
+  misEstadisticas() {
+    return this.http.get<EstadisticasMias>(`${this.api}/api/estadisticas/mias`);
   }
 }

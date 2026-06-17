@@ -72,3 +72,94 @@ export interface EstadoBlackjack {
   totales: { jugador: number; banca: number } | null;
   saldo: number;
 }
+
+// ----- Microservicios -----
+export interface Bono {
+  id: number;
+  codigo: string;
+  nombre: string;
+  descripcion: string;
+  tipo: 'monto_fijo' | 'porcentaje';
+  valor: number;
+  un_solo_uso: boolean;
+}
+
+export interface BonoReclamado {
+  id: number;
+  codigo: string;
+  nombre: string;
+  monto_otorgado: number;
+  reclamado_en: string;
+}
+
+export interface RespuestaReclamarBono {
+  bono: string;
+  monto_otorgado: number;
+  saldo: number;
+}
+
+export interface EventoDeportivo {
+  id: number;
+  deporte: string;
+  liga: string;
+  equipo_local: string;
+  equipo_visita: string;
+  badge_local?: string;
+  badge_visita?: string;
+  inicio?: string;
+  cuota_local: number;
+  cuota_empate: number;
+  cuota_visita: number;
+  estado: string;
+}
+
+export type SeleccionApuestaDeportiva = 'local' | 'empate' | 'visita';
+
+export interface ApuestaDeportiva {
+  id: number;
+  seleccion: SeleccionApuestaDeportiva;
+  monto: number;
+  cuota: number;
+  ganancia_potencial: number;
+  estado: 'pendiente' | 'ganada' | 'perdida';
+  creada_en: string;
+  resuelta_en?: string | null;
+  deporte: string;
+  liga: string;
+  equipo_local: string;
+  equipo_visita: string;
+  resultado?: string | null;
+  goles_local?: number | null;
+  goles_visita?: number | null;
+}
+
+export interface RespuestaApuestaDeportiva {
+  apuesta_id: number;
+  evento_id: number;
+  seleccion: SeleccionApuestaDeportiva;
+  monto: number;
+  cuota: number;
+  ganancia_potencial: number;
+  estado: string;
+  saldo: number;
+}
+
+export interface EstadisticasMias {
+  resumen: {
+    total_apostado: number;
+    total_premios: number;
+    total_depositos: number;
+    neto: number;
+    n_apuestas: number;
+    saldo_actual: number;
+  };
+  por_tipo: Array<{
+    tipo: string;
+    total: number;
+    count: number;
+  }>;
+  linea_saldo: Array<{
+    fecha: string;
+    saldo_post: number;
+  }>;
+}

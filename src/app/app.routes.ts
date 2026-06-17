@@ -31,7 +31,7 @@ export const rutas: Routes = [
   { path: 'blackjack', canActivate: [authGuard], loadComponent: () => import('./components/blackjack/blackjack.component').then(m => m.BlackjackComponent) },
   { path: 'profile',   canActivate: [authGuard], loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent) },
   { path: 'history',   canActivate: [authGuard], loadComponent: () => import('./components/history/history.component').then(m => m.HistoryComponent) },
-
+  { path: 'dashboard', canActivate: [authGuard], loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent) },
   // Cualquier ruta no reconocida → lobby
   { path: '**', redirectTo: 'lobby' }
 ];
