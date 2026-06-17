@@ -21,79 +21,144 @@ import {
         <div>
           <h2 class="titulo-juego">Dashboard</h2>
           <p class="sub">
-            Integración directa con bonos-service, apuestas-service y estadisticas-service.
+            Panel de integración entre bonos, apuestas deportivas y estadísticas del casino.
           </p>
         </div>
-        <button class="btn btn-secundario" (click)="cargarTodo()">Actualizar</button>
+
+        <button class="btn btn-secundario" (click)="cargarTodo()">
+          Actualizar
+        </button>
       </div>
 
       <p *ngIf="error" class="error">{{ error }}</p>
       <p *ngIf="mensaje" class="ok">{{ mensaje }}</p>
 
-      <div class="grid">
-        <article class="panel">
-          <h3>Bonos disponibles</h3>
-          <p class="endpoint">GET /api/bonos</p>
+      <!-- Servicio de Bonos -->
+      <section class="bloque-servicio">
+        <div class="titulo-servicio">
+          <span>Servicio de Bonos</span>
+          <small>Bonos disponibles y beneficios reclamados por el usuario.</small>
+        </div>
 
-          <label class="campo">
-            Monto base para bonos porcentuales
-            <input type="number" [(ngModel)]="montoBaseBono" min="0" step="1000" />
-          </label>
+        <div class="grid dos-columnas">
+          <article class="panel">
+            <h3>Bonos disponibles</h3>
 
-          <div *ngIf="bonos.length; else sinBonos">
-            <div *ngFor="let b of bonos" class="item">
-              <strong>{{ b.codigo }} — {{ b.nombre }}</strong>
-              <span>{{ b.descripcion }}</span>
-              <small>
-                Tipo: {{ b.tipo }} · Valor:
-                <ng-container *ngIf="b.tipo === 'porcentaje'; else montoFijo">{{ b.valor }}%</ng-container>
-                <ng-template #montoFijo>$ {{ b.valor | number:'1.0-0' }}</ng-template>
-              </small>
+            <label class="campo">
+              Monto base para bonos porcentuales
+              <input type="number" [(ngModel)]="montoBaseBono" min="0" step="1000" />
+            </label>
 
-              <button class="btn btn-primario mini" (click)="reclamar(b)">
-                Reclamar bono
-              </button>
-            </div>
-          </div>
+            <div *ngIf="bonos.length; else sinBonos">
+              <div *ngFor="let b of bonos" class="item">
+                <strong>{{ b.codigo }} — {{ b.nombre }}</strong>
+                <span>{{ b.descripcion }}</span>
+                <small>
+                  Tipo: {{ b.tipo }} · Valor:
+                  <ng-container *ngIf="b.tipo === 'porcentaje'; else montoFijo">
+                    {{ b.valor }}%
+                  </ng-container>
+                  <ng-template #montoFijo>
+                    $ {{ b.valor | number:'1.0-0' }}
+                  </ng-template>
+                </small>
 
-          <ng-template #sinBonos>
-            <p class="vacio">No hay bonos disponibles.</p>
-          </ng-template>
-        </article>
-
-        <article class="panel">
-          <h3>Apuestas deportivas</h3>
-          <p class="endpoint">GET /api/apuestas/eventos · POST /api/apuestas</p>
-
-          <label class="campo">
-            Monto de apuesta
-            <input type="number" [(ngModel)]="montoApuesta" min="10" step="10" />
-          </label>
-
-          <div *ngIf="eventos.length; else sinEventos">
-            <div *ngFor="let e of eventos" class="item">
-              <strong>{{ e.equipo_local }} vs {{ e.equipo_visita }}</strong>
-              <span>{{ e.liga || 'Liga no informada' }} · {{ e.deporte }}</span>
-              <small>
-                Local {{ e.cuota_local }} · Empate {{ e.cuota_empate }} · Visita {{ e.cuota_visita }}
-              </small>
-
-              <div class="acciones-apuesta">
-                <button class="btn mini" (click)="apostar(e, 'local')">Local</button>
-                <button class="btn mini" (click)="apostar(e, 'empate')">Empate</button>
-                <button class="btn mini" (click)="apostar(e, 'visita')">Visita</button>
+                <button class="btn btn-primario mini" (click)="reclamar(b)">
+                  Reclamar bono
+                </button>
               </div>
             </div>
-          </div>
 
-          <ng-template #sinEventos>
-            <p class="vacio">No hay eventos abiertos.</p>
-          </ng-template>
-        </article>
+            <ng-template #sinBonos>
+              <p class="vacio">No hay bonos disponibles.</p>
+            </ng-template>
+          </article>
 
-        <article class="panel">
+          <article class="panel">
+            <h3>Mis bonos reclamados</h3>
+
+            <div *ngIf="bonosReclamados.length; else sinReclamados">
+              <div *ngFor="let b of bonosReclamados" class="item compacto">
+                <strong>{{ b.codigo }} — {{ b.nombre }}</strong>
+                <span>Monto otorgado: $ {{ b.monto_otorgado | number:'1.0-0' }}</span>
+              </div>
+            </div>
+
+            <ng-template #sinReclamados>
+              <p class="vacio">Aún no hay bonos reclamados.</p>
+            </ng-template>
+          </article>
+        </div>
+      </section>
+
+      <!-- Servicio de Apuestas -->
+      <section class="bloque-servicio">
+        <div class="titulo-servicio">
+          <span>Servicio de Apuestas Deportivas</span>
+          <small>Eventos disponibles y apuestas deportivas realizadas.</small>
+        </div>
+
+        <div class="grid dos-columnas">
+          <article class="panel">
+            <h3>Eventos deportivos</h3>
+
+            <label class="campo">
+              Monto de apuesta
+              <input type="number" [(ngModel)]="montoApuesta" min="10" step="10" />
+            </label>
+
+            <div *ngIf="eventos.length; else sinEventos">
+              <div *ngFor="let e of eventos" class="item">
+                <strong>{{ e.equipo_local }} vs {{ e.equipo_visita }}</strong>
+                <span>{{ e.liga || 'Liga no informada' }} · {{ e.deporte }}</span>
+                <small>
+                  Local {{ e.cuota_local }} · Empate {{ e.cuota_empate }} · Visita {{ e.cuota_visita }}
+                </small>
+
+                <div class="acciones-apuesta">
+                  <button class="btn mini" (click)="apostar(e, 'local')">Local</button>
+                  <button class="btn mini" (click)="apostar(e, 'empate')">Empate</button>
+                  <button class="btn mini" (click)="apostar(e, 'visita')">Visita</button>
+                </div>
+              </div>
+            </div>
+
+            <ng-template #sinEventos>
+              <p class="vacio">No hay eventos abiertos.</p>
+            </ng-template>
+          </article>
+
+          <article class="panel">
+            <h3>Mis apuestas deportivas</h3>
+
+            <div *ngIf="misApuestas.length; else sinMisApuestas">
+              <div *ngFor="let a of misApuestas" class="item compacto">
+                <strong>{{ a.equipo_local }} vs {{ a.equipo_visita }}</strong>
+                <span>
+                  Selección: {{ a.seleccion }} · Estado: {{ a.estado }}
+                </span>
+                <small>
+                  Monto: $ {{ a.monto | number:'1.0-0' }} · Cuota: {{ a.cuota }}
+                </small>
+              </div>
+            </div>
+
+            <ng-template #sinMisApuestas>
+              <p class="vacio">Aún no tienes apuestas deportivas.</p>
+            </ng-template>
+          </article>
+        </div>
+      </section>
+
+      <!-- Servicio de Estadísticas -->
+      <section class="bloque-servicio">
+        <div class="titulo-servicio">
+          <span>Servicio de Estadísticas</span>
+          <small>Resumen de actividad, premios, depósitos y saldo actual.</small>
+        </div>
+
+        <article class="panel panel-estadisticas">
           <h3>Mis estadísticas</h3>
-          <p class="endpoint">GET /api/estadisticas/mias</p>
 
           <div *ngIf="estadisticas as est; else sinStats" class="kpis">
             <div>
@@ -126,46 +191,7 @@ import {
             <p class="vacio">No se pudieron cargar estadísticas.</p>
           </ng-template>
         </article>
-      </div>
-
-      <div class="grid inferior">
-        <article class="panel">
-          <h3>Mis bonos reclamados</h3>
-          <p class="endpoint">GET /api/bonos/mis-bonos</p>
-
-          <div *ngIf="bonosReclamados.length; else sinReclamados">
-            <div *ngFor="let b of bonosReclamados" class="item compacto">
-              <strong>{{ b.codigo }} — {{ b.nombre }}</strong>
-              <span>Monto otorgado: $ {{ b.monto_otorgado | number:'1.0-0' }}</span>
-            </div>
-          </div>
-
-          <ng-template #sinReclamados>
-            <p class="vacio">Aún no hay bonos reclamados.</p>
-          </ng-template>
-        </article>
-
-        <article class="panel">
-          <h3>Mis apuestas deportivas</h3>
-          <p class="endpoint">GET /api/apuestas/mis-apuestas</p>
-
-          <div *ngIf="misApuestas.length; else sinMisApuestas">
-            <div *ngFor="let a of misApuestas" class="item compacto">
-              <strong>{{ a.equipo_local }} vs {{ a.equipo_visita }}</strong>
-              <span>
-                Selección: {{ a.seleccion }} · Estado: {{ a.estado }}
-              </span>
-              <small>
-                Monto: $ {{ a.monto | number:'1.0-0' }} · Cuota: {{ a.cuota }}
-              </small>
-            </div>
-          </div>
-
-          <ng-template #sinMisApuestas>
-            <p class="vacio">Aún no tienes apuestas deportivas.</p>
-          </ng-template>
-        </article>
-      </div>
+      </section>
     </section>
   `,
   styles: [`
@@ -179,7 +205,7 @@ import {
       justify-content: space-between;
       gap: 16px;
       align-items: flex-start;
-      margin-bottom: 18px;
+      margin-bottom: 22px;
     }
 
     .sub {
@@ -187,14 +213,37 @@ import {
       margin-top: 6px;
     }
 
+    .bloque-servicio {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(16, 185, 129, 0.14);
+    }
+
+    .titulo-servicio {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .titulo-servicio span {
+      color: #d4af37;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .titulo-servicio small {
+      color: #6a8a7a;
+      font-size: 13px;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
       gap: 16px;
     }
 
-    .inferior {
-      margin-top: 16px;
+    .dos-columnas {
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
     }
 
     .panel {
@@ -204,16 +253,13 @@ import {
       padding: 16px;
     }
 
-    .panel h3 {
-      color: #d4af37;
-      margin: 0 0 4px;
+    .panel-estadisticas {
+      max-width: 760px;
     }
 
-    .endpoint {
-      font-size: 12px;
-      color: #10b981;
-      opacity: .82;
-      margin-bottom: 14px;
+    .panel h3 {
+      color: #d4af37;
+      margin: 0 0 14px;
     }
 
     .campo {
@@ -275,7 +321,7 @@ import {
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(2, minmax(120px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 10px;
     }
 
